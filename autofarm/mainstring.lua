@@ -403,11 +403,11 @@ Tabs.SpawnerTab:Button({
         end
 
         print("Spawning seed: " .. seed .. " x" .. qty)
-        local seedModels = game:GetService("ReplicatedStorage"):FindFirstChild("Seed_Models")
+        local seedModels = findSeedModels()
         if not seedModels then
             WindUI:Notify({
                 Title = "Error",
-                Content = "Seed_Models not found in ReplicatedStorage.",
+                Content = "Seed models not found in ReplicatedStorage. Check game update.",
                 Icon = "alert-circle",
                 Duration = 5,
             })
@@ -427,7 +427,7 @@ Tabs.SpawnerTab:Button({
         if not found then
             WindUI:Notify({
                 Title = "Error",
-                Content = "Seed '" .. seed .. "' not found in Seed_Models.",
+                Content = "Seed '" .. seed .. "' not found in Seed_Models. It may not be available yet.",
                 Icon = "alert-circle",
                 Duration = 5,
             })
@@ -686,5 +686,21 @@ Tabs.SpawnerTab:Button({
         end
     end
 })
+
+-- Function to find Seed_Models recursively
+function findSeedModels()
+    local function searchFolder(folder, targetName)
+        for _, child in pairs(folder:GetChildren()) do
+            if child.Name:lower() == targetName:lower() then
+                return child
+            elseif child:IsA("Folder") then
+                local result = searchFolder(child, targetName)
+                if result then return result end
+            end
+        end
+        return nil
+    end
+    return searchFolder(game:GetService("ReplicatedStorage"), "Seed_Models")
+end
 
 print("Script fully loaded. UI should be visible.")
